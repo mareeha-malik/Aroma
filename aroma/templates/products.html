@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .products-header {
+        text-align: center;
+        margin-bottom: 4rem;
+        padding-bottom: 3rem;
+        border-bottom: 1px solid #c6c6c6;
+    }
+
+    .products-header h1 {
+        font-size: 3.5rem;
+        color: #f5f5f5;
+        margin-bottom: 1rem;
+        letter-spacing: 3px;
+        font-weight: 300;
+    }
+
+    .products-header p {
+        color: #b8b8b8;
+        font-size: 1rem;
+        letter-spacing: 1px;
+    }
+
+    /* Grid layout for products - Loop comment: This loop iterates through paginated products and displays each one in a card format */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 3rem;
+        margin-bottom: 4rem;
+    }
+
+    /* Product Card Styles */
+    .product-card {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #c6c6c6;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 50px rgba(198, 198, 198, 0.2);
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    .product-image {
+        width: 100%;
+        height: 240px;
+        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-bottom: 1px solid #c6c6c6;
+        position: relative;
+    }
+
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+
+    .product-card:hover .product-image img {
+        transform: scale(1.08);
+    }
+
+    .placeholder-image {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+        font-size: 4rem;
+    }
+
+    .product-info {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-info h3 {
+        font-size: 1.1rem;
+        color: #c6c6c6;
+        margin-bottom: 0.4rem;
+        transition: all 0.3s ease;
+        letter-spacing: 0.5px;
+        font-weight: 400;
+    }
+
+    .product-card:hover .product-info h3 {
+        color: #f5f5f5;
+    }
+
+    .description {
+        color: #999;
+        font-size: 0.8rem;
+        margin-bottom: 0.8rem;
+        flex-grow: 1;
+        line-height: 1.4;
+    }
+
+    .product-footer {
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+        margin-top: auto;
+    }
+
+    .price {
+        font-size: 1.2rem;
+        color: #c6c6c6;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+    }
+
+    .stock-status {
+        padding: 0.4rem 0.8rem;
+        border-radius: 0;
+        font-weight: 500;
+        text-align: center;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stock-status.in-stock {
+        background-color: rgba(76, 175, 80, 0.2);
+        color: #7dc15a;
+        border: 1px solid #7dc15a;
+    }
+
+    .stock-status.out-of-stock {
+        background-color: rgba(244, 67, 54, 0.2);
+        color: #f44336;
+        border: 1px solid #f44336;
+    }
+
+    .add-to-cart-btn {
+        padding: 0.6rem 1.2rem;
+        background-color: #c6c6c6;
+        color: #000;
+        border: 1px solid #c6c6c6;
+        border-radius: 0;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.75rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .add-to-cart-btn:hover:not(.disabled) {
+        background-color: transparent;
+        color: #c6c6c6;
+        box-shadow: 0 8px 20px rgba(198, 198, 198, 0.15);
+    }
+
+    .add-to-cart-btn.disabled {
+        background-color: #666;
+        color: #999;
+        cursor: not-allowed;
+        opacity: 0.5;
+        border-color: #666;
+    }
+
+    /* Pagination Styles */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 4rem;
+        padding-top: 3rem;
+        border-top: 1px solid #c6c6c6;
+    }
+
+    .pagination a,
+    .pagination span {
+        padding: 0.7rem 1rem;
+        border: 1px solid #c6c6c6;
+        border-radius: 0;
+        color: #c6c6c6;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .pagination a:hover {
+        background-color: #c6c6c6;
+        color: #1a1a1a;
+        border-color: #c6c6c6;
+    }
+
+    .pagination span.current {
+        background-color: #c6c6c6;
+        color: #1a1a1a;
+        border-color: #c6c6c6;
+    }
+
+    .pagination span.dots {
+        border: none;
+        cursor: default;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        background: rgba(212, 175, 55, 0.1);
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .no-results h2 {
+        color: #d4af37;
+        margin-bottom: 1rem;
+    }
+
+    .no-results p {
+        color: #b0b0b0;
+    }
+
+    @media (max-width: 768px) {
+        .products-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .pagination {
+            gap: 0.3rem;
+        }
+
+        .pagination a,
+        .pagination span {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="products-header">
+    <h1>Our Collection</h1>
+    <p>Explore our exclusive range of luxury fragrances</p>
+    {% if search_query %}
+        <p style="color: #d4af37; margin-top: 1rem;">Search results for: <strong>"{{ search_query }}"</strong></p>
+    {% endif %}
+</div>
+
+{% if products %}
+    <!-- This loop iterates through paginated products and displays each using the product_card include template -->
+    <div class="products-grid">
+        {% for product in products %}
+            {% include 'includes/product_card.html' %}
+        {% endfor %}
+    </div>
+
+    <!-- Pagination section -->
+    {% if paginator.num_pages > 1 %}
+        <div class="pagination">
+            {% if products.has_previous %}
+                <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">« First</a>
+                <a href="?page={{ products.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">‹ Previous</a>
+            {% endif %}
+
+            {% for num in paginator.page_range %}
+                {% if products.number == num %}
+                    <span class="current">{{ num }}</span>
+                {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                {% elif num == 1 or num == paginator.num_pages %}
+                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                {% elif num == products.number|add:'-3' or num == products.number|add:'3' %}
+                    <span class="dots">...</span>
+                {% endif %}
+            {% endfor %}
+
+            {% if products.has_next %}
+                <a href="?page={{ products.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Next ›</a>
+                <a href="?page={{ paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">Last »</a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% else %}
+    <div class="no-results">
+        <h2>No Products Found</h2>
+        <p>
+            {% if search_query %}
+                We couldn't find any products matching "{{ search_query }}". Please try a different search.
+            {% else %}
+                No products available at the moment. Please check back soon!
+            {% endif %}
+        </p>
+        <a href="{% url 'products' %}" style="color: #f5f5f5; text-decoration: underline; margin-top: 1rem; display: inline-block;">View All Products</a>
+    </div>
+{% endif %}
+{% endblock %}

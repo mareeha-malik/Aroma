@@ -1,0 +1,511 @@
+{% extends 'base.html' %} {% load store_tags %} {% block content %}
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    margin-bottom: 3rem;
+    margin-top: -4rem;
+    padding: 1rem 0;
+  }
+
+  .hero-content {
+    padding-right: 3rem;
+  }
+
+  .hero-content h1 {
+    font-size: 4.5rem;
+    color: #f5f5f5;
+    margin-bottom: 2rem;
+    font-weight: 300;
+    letter-spacing: 4px;
+    line-height: 1.2;
+  }
+
+  .hero-content p {
+    font-size: 1.1rem;
+    color: #d0d0d0;
+    margin-bottom: 3rem;
+    line-height: 1.8;
+    font-weight: 300;
+  }
+
+  .welcome-message {
+    font-size: 1.2rem;
+    color: #c6c6c6;
+    font-weight: 400;
+    margin-bottom: 2rem;
+    letter-spacing: 1px;
+  }
+
+  .cta-button {
+    
+    display: inline-block;
+    padding: 1rem 2.8rem;
+    background-color: #c6c6c600;
+    color: #f2f2f2;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 0;
+    transition: all 0.4s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: 2px solid #c6c6c6;
+  }
+
+  .cta-button:hover {
+    background-color: #c6c6c6;
+    color: #000;
+  }
+
+  .hero-visual {
+    position: relative;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 650px;
+  }
+
+  .perfume-image {
+    max-width: 100%;
+    height: 100%;
+    object-fit: contain;
+    max-height: 650px;
+    filter: drop-shadow(0 20px 60px rgba(217, 217, 217, 0.2));
+    transition: opacity 0.8s ease-in-out;
+    transform: scale(1.15);
+    position: absolute;
+    opacity: 0;
+  }
+
+  .perfume-image.active {
+    opacity: 1;
+  }
+
+  .hero-visual:hover .perfume-image.active {
+    filter: drop-shadow(0 30px 80px rgba(217, 217, 217, 0.35));
+    transform: translateY(-10px) scale(1.15);
+  }
+
+  /* ===== CAROUSEL STYLES ===== */
+  .carousel-section {
+    margin: 4rem 0;
+    padding: 3rem 2rem;
+    border-top: 1px solid #c6c6c6;
+    border-bottom: 1px solid #c6c6c6;
+    position: relative;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+  }
+
+  .carousel-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .carousel-container {
+    display: flex;
+    gap: 2rem;
+    overflow-x: auto;
+    padding: 1rem 0;
+    scroll-behavior: smooth;
+    flex: 1;
+  }
+
+  .carousel-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .carousel-item {
+    flex: 0 0 280px;
+    text-align: center;
+    transition: all 0.4s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .carousel-item:hover {
+    transform: translateY(-8px);
+  }
+
+  .carousel-item-image {
+    width: 280px;
+    height: 340px;
+    border: 1px solid  #c6c6c6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  .carousel-item-image img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+  }
+
+  .carousel-item-name {
+    font-size: 1.1rem;
+    color:  #c6c6c6;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+    font-weight: 400;
+  }
+
+  .carousel-item-price {
+    font-size: 1rem;
+    color: #f5f5f5;
+    font-weight: 300;
+  }
+.carousel-nav-btn {
+  background: transparent; /* remove background */
+  border: none;            /* remove border */
+  color: #c6c6c6;          /* arrow color */
+  width: auto;             /* optional, fit content */
+  height: auto;            /* optional, fit content */
+  font-size: 2rem;         /* arrow size */
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0 0.5rem;       /* spacing around arrow */
+  transition: all 0.3s ease;
+}
+
+.carousel-nav-btn:hover {
+  color: #fff; /* change color on hover */
+  transform: scale(1.2); /* slight grow effect */
+}
+
+  /* ===== FEATURED SECTION STYLES ===== */
+  .featured-section {
+    margin-top: 6rem;
+    text-align: center;
+    padding-bottom: 4rem;
+  }
+
+  .featured-section h2 {
+    font-size: 3.5rem;
+    color: #f5f5f5;
+    margin-bottom: 1rem;
+    letter-spacing: 3px;
+    font-weight: 300;
+  }
+
+  .section-divider {
+    width: 60px;
+    height: 1px;
+    background-color: #c6c6c6;
+    margin: 2rem auto;
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+    margin-top: 4rem;
+  }
+
+  .featured-card {
+    padding: 3rem 2rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #c6c6c6;
+    transition: all 0.4s ease;
+    position: relative;
+  }
+
+  .featured-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(212, 175, 55, 0.05);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 0;
+  }
+
+  .featured-card:hover::before {
+    opacity: 1;
+  }
+
+  .featured-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 50px rgba(214, 214, 214, 0.25);
+  }
+
+  .featured-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .featured-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+  }
+
+  .featured-card h3 {
+    color: #c6c6c6;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  .featured-card p {
+    color: #b8b8b8;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .cta-button-secondary {
+    display: inline-block;
+    padding: 0.75rem 1.8rem;
+    border: 1px solid  #c6c6c6;
+    color: #c6c6c6;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    background: transparent;
+  }
+
+  .cta-button-secondary:hover {
+    background-color: #c6c6c6;
+    color: #000;
+  }
+
+  @media (max-width: 1024px) {
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .hero-content {
+      padding-right: 0;
+    }
+
+    .hero-content h1 {
+      font-size: 3.5rem;
+    }
+
+    .carousel-item {
+      flex: 0 0 240px;
+    }
+
+    .carousel-item-image {
+      width: 240px;
+      height: 280px;
+    }
+
+    .featured-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-content h1 {
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+    }
+
+    .featured-section h2 {
+      font-size: 2.2rem;
+    }
+
+    .featured-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .carousel-wrapper {
+      gap: 1rem;
+    }
+
+    .carousel-item {
+      flex: 0 0 200px;
+    }
+
+    .carousel-item-image {
+      width: 200px;
+      height: 240px;
+    }
+
+    .carousel-nav-btn {
+      width: 38px;
+      height: 38px;
+      font-size: 1.5rem;
+    }
+  }
+  .hero-content h1 .line-break {
+  display: block;
+  white-space: nowrap; /* prevents unwanted wrapping */
+}
+
+</style>
+<section class="hero">
+  <div class="hero-content">
+<h1>
+  Essence <span class="line-break">of Elegance</span>
+</h1>
+
+    <!-- {% if user.is_authenticated %}
+    <div class="welcome-message">Welcome back, {{ user.username }}</div>
+    <p>
+      Discover the essence of sophistication with our exclusive collection of
+      luxurious fragrances. Continue your journey into the world of premium
+      perfumes.
+    </p>
+    {% else %}
+    <div class="welcome-message">Experience Elegance</div>
+    <p>
+      Discover the essence of sophistication with our exclusive collection of
+      luxurious fragrances. Sign in to unlock your personal fragrance
+      collection.
+    </p>
+    {% endif %} -->
+
+    <a href="{% url 'products' %}" class="cta-button">SHOP NOW</a>
+  </div>
+
+  <div class="hero-visual">
+    {% load static %}
+    <img
+      src="{% static 'images/hero.png' %}"
+      alt="Aroma Luxury Perfume"
+      class="perfume-image active"
+      id="hero-img-0"
+    />
+    <img
+      src="{% static 'images/hero2.png' %}"
+      alt="Aroma Luxury Perfume"
+      class="perfume-image"
+      id="hero-img-1"
+    />
+    <img
+      src="{% static 'images/hero3.png' %}"
+      alt="Aroma Luxury Perfume"
+      class="perfume-image"
+      id="hero-img-2"
+    />
+  </div>
+
+  <script>
+    let currentImageIndex = 0;
+    const totalImages = 3;
+    const rotationInterval = 3000; // 3 seconds
+
+    function rotateHeroImages() {
+      // Remove active class from all images
+      for (let i = 0; i < totalImages; i++) {
+        document.getElementById(`hero-img-${i}`).classList.remove('active');
+      }
+      
+      // Add active class to current image
+      document.getElementById(`hero-img-${currentImageIndex}`).classList.add('active');
+      
+      // Move to next image
+      currentImageIndex = (currentImageIndex + 1) % totalImages;
+    }
+
+    // Start rotation
+    setInterval(rotateHeroImages, rotationInterval);
+  </script>
+</section>
+
+<!-- Product Carousel Section -->
+<section class="carousel-section">
+  <h2 style="text-align: center; color: #f5f5f5; font-size: 3rem; margin-bottom: 3rem; letter-spacing: 3px; font-weight: 300;">OUR COLLECTION</h2>
+  <div class="carousel-wrapper">
+    <button
+      class="carousel-nav-btn prev"
+      onclick="document.querySelector('.carousel-container').scrollBy({left: -300, behavior: 'smooth'})"
+    >
+      ‹
+    </button>
+
+    <div class="carousel-container" id="carousel">
+      {% load static %}
+      {% for product in products %}
+      <div class="carousel-item">
+        <div class="carousel-item-image">
+          <img
+            src="{% static 'images/products/' %}{{ forloop.counter }}.png"
+            alt="{{ product.name }}"
+          />
+        </div>
+        <div class="carousel-item-name">{{ product.name }}</div>
+        <div class="carousel-item-price">${{ product.price|format_price }}</div>
+      </div>
+      {% empty %}
+      <div class="carousel-item">
+        <p style="color: #999">No products available</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <button
+      class="carousel-nav-btn next"
+      onclick="document.querySelector('.carousel-container').scrollBy({left: 300, behavior: 'smooth'})"
+    >
+      ›
+    </button>
+  </div>
+</section>
+
+<section class="featured-section">
+  <h2>WHY CHOOSE US</h2>
+  <div class="section-divider"></div>
+
+  <div class="featured-grid">
+    <div class="featured-card">
+      <div class="featured-content">
+        <h3>ELEGANCE</h3>
+        <p>Timeless sophistication in every drop with the finest ingredients.</p>
+        <a
+          href="{% url 'products' %}?search=Elegance"
+          class="cta-button-secondary"
+          >Explore</a
+        >
+      </div>
+    </div>
+    <div class="featured-card">
+      <div class="featured-content">
+        <h3>VELOUR</h3>
+        <p>Luxury redefined with sensual, premium fragrances for the discerning.</p>
+        <a
+          href="{% url 'products' %}?search=Velour"
+          class="cta-button-secondary"
+          >Explore</a
+        >
+      </div>
+    </div>
+    <div class="featured-card">
+      <div class="featured-content">
+        <h3>DIVINE</h3>
+        <p>Transform moments into memories with fragrances that leave lasting impressions.</p>
+        <a
+          href="{% url 'products' %}?search=Divine"
+          class="cta-button-secondary"
+          >Explore</a
+        >
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
